@@ -4,22 +4,22 @@
 #include <format>
 #include <mutex>
 #include <queue>
-#include <string>
 #include <stop_token>
+#include <string>
 #include <string_view>
 
 extern void (*print)(std::string_view message);
 
 class logger {
   private:
-    std::mutex mutex_;
     std::condition_variable_any cv_;
     std::queue<std::string> queue_;
-
+    std::mutex mutex_;
+  
   public:
     void post(std::string_view message) {
       {
-        std::lock_guard lock { mutex_ };
+        std::lock_guard lock{mutex_};
         queue_.emplace(message);
       }
 
@@ -35,17 +35,17 @@ class logger {
     }
 
     void run(std::stop_token stop) {
-      while (true) {
+      for (;;) {
         std::string message;
 
         {
-          std::unique_lock lock { mutex_ };
+          std::unique_lock lock{mutex_};
 
           cv_.wait(lock, stop, [&] {
             return !queue_.empty();
           });
 
-          if (queue_.empty() && stop.stop_requested()) {
+          if (queue_.empty()) {
             return;
           }
 
