@@ -1,8 +1,8 @@
 #include <logger.hpp>
 #include <mutex>
-#include <thread>
 #include <cstdio>
 #include <cassert>
+#include <vector>
 
 static std::mutex mutex;
 std::vector<std::string> messages;
@@ -25,9 +25,11 @@ int main(int argc, char* argv[])
   
     log.post("hello");
     log.post("number: {}", 67);
+    log.post("number: {}", 76);
   }
 
-  assert(messages.size() == 2);
+  assert(messages.size() == 3); 
   assert(messages[0] == "hello");
   assert(messages[1] == "number: 67");
+  assert(messages[2] == "number: 76");
 }
